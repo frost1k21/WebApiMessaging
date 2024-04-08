@@ -24,9 +24,9 @@ namespace WebApiMessaging.Tests.Services
             };
             var messages = new List<MessagePostDto> { messagePostDto };
             await sut.AddMessages(messages, default);
-            var result = await sut.GetMessage(1, default);
-            Assert.Equal(subject, result.MessageGetDto.Subject);
-            Assert.Equal(body, result.MessageGetDto.Body);
+            var result = await sut.GetMessages(1, 1, default);
+            Assert.Equal(subject, result.MessageGetDtos.First().Subject);
+            Assert.Equal(body, result.MessageGetDtos.First().Body);
         }
 
         [Fact]
@@ -48,8 +48,8 @@ namespace WebApiMessaging.Tests.Services
             var messages = new List<MessagePostDto> { messagePostDto };
 
             await sut.AddMessages(messages, default);
-            var _ = await sut.GetMessage(1, default);
-            var result = await sut.GetMessage(1, default);
+            var _ = await sut.GetMessages(1, 1, default);
+            var result = await sut.GetMessages(1, 1, default);
 
             Assert.Equal("There are no new messages", result.Error);
         }
@@ -61,7 +61,7 @@ namespace WebApiMessaging.Tests.Services
             var messageBus = new InMemoryMessagesBus();
             var sut = new MessageService(messageBus);
 
-            var result = await sut.GetMessage(userId, default);
+            var result = await sut.GetMessages(userId, 1, default);
 
             Assert.Equal($"User with id {userId} not found in message queue", result.Error);
         }

@@ -16,16 +16,16 @@ namespace WebApiMessaging.Controllers
             this._messageService = messageService;
         }
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(MessageGetDto))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<MessageGetDto>))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-        public async Task<IActionResult> GetMessage([FromQuery]int rcpt, CancellationToken ct)
+        public async Task<IActionResult> GetMessages([FromQuery]int rcpt, int messageNumbers = 1, CancellationToken ct = default)
         {
-            var result = await _messageService.GetMessage(rcpt, ct);
+            var result = await _messageService.GetMessages(rcpt, messageNumbers, ct);
             if (!string.IsNullOrEmpty(result.Error))
             {
                 return NotFound(result.Error);
             }
-            return Ok(result.MessageGetDto);
+            return Ok(result.MessageGetDtos);
         }
 
         [HttpPost]
@@ -39,7 +39,7 @@ namespace WebApiMessaging.Controllers
             }
 
             await _messageService.AddMessages(messagesPostDto.Messages, ct);
-            return CreatedAtAction(nameof(GetMessage), new { rcpt = messagesPostDto.Messages.First().Recipients.First() }, null);
+            return CreatedAtAction(nameof(GetMessages), new { rcpt = messagesPostDto.Messages.First().Recipients.First() }, null);
         }
     }
 }

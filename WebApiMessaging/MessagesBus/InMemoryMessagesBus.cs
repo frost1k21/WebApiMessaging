@@ -23,28 +23,39 @@ namespace WebApiMessaging.MessagesBus
             return Task.CompletedTask;
         }
 
-        public Task<Message> GetMessageForUser(int userId, CancellationToken ct = default)
+        public Task<List<Message>> GetMessagesForUser(int userId, int messagesNumber = 1, CancellationToken ct = default)
         {
+            var messages = new List<Message>();
             if (!_usersMessageQueues.ContainsKey(userId))
             {
-                return Task.FromResult(Message.Empty);
+                messages.Add(Message.Empty);
+                return Task.FromResult(messages);
             }
 
             if (!(_usersMessageQueues[userId].Count > 0))
             {
                 var emptyMessageForUser = Message.Empty;
                 emptyMessageForUser.Recipients.Add(userId);
-                return Task.FromResult(emptyMessageForUser);
+                messages.Add(emptyMessageForUser);
+                return Task.FromResult(messages);
             }
-
-            var messageId = _usersMessageQueues[userId].Dequeue();
-            var message = _messages[messageId];
-            message.Recipients.Remove(userId);
-            if(message.Recipients.Count == 0)
+            
+            for (int i = 1; i <= messagesNumber; i++)
             {
-                _messages.Remove(messageId);
+                var messageId = _usersMessageQueues[userId].Dequeue();
+                var message = _messages[messageId];
+                message.Recipients.Remove(userId);
+                if (message.Recipients.Count == 0)
+                {
+                    _messages.Remove(messageId);
+                }
+                messages.Add(message);
+                if ((_usersMessageQueues[userId].Count == 0))
+                {
+                    break;
+                }
             }
-            return Task.FromResult(message);
+            return Task.FromResult(messages);
         }
     }
 }

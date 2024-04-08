@@ -20,17 +20,17 @@ namespace WebApiMessaging.Tests.MessagesBus
 
             await sut.AddMessageToQueue(message);
 
-            var resultOne = await sut.GetMessageForUser(1);
-            var resultTwo = await sut.GetMessageForUser(2);
-            var resultThree = await sut.GetMessageForUser(3);
+            var resultOne = await sut.GetMessagesForUser(1, 1);
+            var resultTwo = await sut.GetMessagesForUser(2, 1);
+            var resultThree = await sut.GetMessagesForUser(3, 1);
 
             Assert.NotNull(resultOne);
-            Assert.Equal(body, resultOne.Body);
-            Assert.Equal(subject, resultOne.Subject);
-            Assert.NotEqual(Guid.Empty, resultOne.MessageId);
+            Assert.Equal(body, resultOne.First().Body);
+            Assert.Equal(subject, resultOne.First().Subject);
+            Assert.NotEqual(Guid.Empty, resultOne.First().MessageId);
 
-            Assert.Equal(resultOne.Subject, resultTwo.Subject);
-            Assert.Equal(resultOne.MessageId, resultThree.MessageId);
+            Assert.Equal(resultOne.First().Subject, resultTwo.First().Subject);
+            Assert.Equal(resultOne.First().MessageId, resultThree.First().MessageId);
         }
 
         [Fact]
@@ -48,12 +48,12 @@ namespace WebApiMessaging.Tests.MessagesBus
 
             await sut.AddMessageToQueue(message);
 
-            var _ = await sut.GetMessageForUser(1);
-            var result = await sut.GetMessageForUser(1);
+            var _ = await sut.GetMessagesForUser(1, 1);
+            var result = await sut.GetMessagesForUser(1, 1);
             Assert.NotNull(result);
-            Assert.Equal(Guid.Empty, result.MessageId);
-            Assert.True(result.IsEmptyForUser());
-            Assert.Equal(1, result.Recipients.First());
+            Assert.Equal(Guid.Empty, result.First().MessageId);
+            Assert.True(result.First().IsEmptyForUser());
+            Assert.Equal(1, result.First().Recipients.First());
         }
 
         [Fact]
@@ -61,9 +61,9 @@ namespace WebApiMessaging.Tests.MessagesBus
         {
             var sut = new InMemoryMessagesBus();
 
-            var result = await sut.GetMessageForUser(1);
+            var result = await sut.GetMessagesForUser(1, 1);
 
-            Assert.True(result.IsEmpty());
+            Assert.True(result.First().IsEmpty());
         }
     }
 }

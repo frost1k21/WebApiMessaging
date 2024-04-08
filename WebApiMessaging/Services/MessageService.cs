@@ -21,19 +21,19 @@ namespace WebApiMessaging.Services
                 await _messagesBus.AddMessageToQueue(message, ct);
             }
         }
-        public async Task<(MessageGetDto MessageGetDto, string Error)> GetMessage(int userId, CancellationToken ct)
+        public async Task<(List<MessageGetDto> MessageGetDtos, string Error)> GetMessages(int userId, int messagesNumber, CancellationToken ct)
         {
-            var message = await _messagesBus.GetMessageForUser(userId, ct);
-            if (message.IsEmpty())
+            var messages = await _messagesBus.GetMessagesForUser(userId, messagesNumber, ct);
+            if (messages.First().IsEmpty())
             {
-                return (new MessageGetDto(), $"User with id {userId} not found in message queue");
+                return (new (), $"User with id {userId} not found in message queue");
             }
-            if (message.IsEmptyForUser())
+            if (messages.First().IsEmptyForUser())
             {
-                return (new MessageGetDto(), $"There are no new messages");
+                return (new (), $"There are no new messages");
             }
 
-            var result = message.ToDto();
+            var result = messages.Select(m => m.ToDto()).ToList();
             return (result, "");
         }
     }
