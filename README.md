@@ -1,2 +1,6 @@
 # WebApiMessaging
- WebApiMessaging test work
+ WebApiMessaging выполнение тестового задания.
+
+ Создать WebAPI сервис, реализующий рассылку сообщений пользователям от администратора.
+
+ 
