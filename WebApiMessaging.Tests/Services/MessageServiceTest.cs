@@ -22,8 +22,8 @@ namespace WebApiMessaging.Tests.Services
                 Body = body,
                 Recipients = recipients
             };
-
-            await sut.AddMessage(messagePostDto, default);
+            var messages = new List<MessagePostDto> { messagePostDto };
+            await sut.AddMessages(messages, default);
             var result = await sut.GetMessage(1, default);
             Assert.Equal(subject, result.MessageGetDto.Subject);
             Assert.Equal(body, result.MessageGetDto.Body);
@@ -45,8 +45,9 @@ namespace WebApiMessaging.Tests.Services
                 Body = body,
                 Recipients = recipients
             };
+            var messages = new List<MessagePostDto> { messagePostDto };
 
-            await sut.AddMessage(messagePostDto, default);
+            await sut.AddMessages(messages, default);
             var _ = await sut.GetMessage(1, default);
             var result = await sut.GetMessage(1, default);
 

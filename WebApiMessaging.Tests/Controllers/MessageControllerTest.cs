@@ -17,12 +17,14 @@ namespace WebApiMessaging.Tests.Controllers
                 Body = "testBody",
                 Recipients = new int[] { 1, 2 }
             };
+            var messages = new List<MessagePostDto> { messageDto };
+            var messagesDto = new MessagesPost { Messages = messages.ToArray() };
             var messageBus = new InMemoryMessagesBus();
             var messageService = new MessageService(messageBus);
             var sut = new MessageController(messageService);
             
 
-            var _ = await sut.SendMessage(messageDto, default);
+            var _ = await sut.SendMessage(messagesDto, default);
             var result = await sut.GetMessage(1, default);
 
             var actionResult = Assert.IsAssignableFrom<IActionResult>(result);

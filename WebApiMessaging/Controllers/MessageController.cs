@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApiMessaging.Dtos;
 using WebApiMessaging.Services;
+using WebApiMessaging.ValidationAttributes;
 
 namespace WebApiMessaging.Controllers
 {
@@ -30,15 +31,15 @@ namespace WebApiMessaging.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> SendMessage([FromBody] MessagePostDto messagePostDto, CancellationToken ct)
+        public async Task<IActionResult> SendMessage([FromBody] MessagesPost messagesPostDto, CancellationToken ct)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            await _messageService.AddMessage(messagePostDto, ct);
-            return CreatedAtAction(nameof(GetMessage), new { rcpt = messagePostDto.Recipients.First() }, null);
+            await _messageService.AddMessages(messagesPostDto.Messages, ct);
+            return CreatedAtAction(nameof(GetMessage), new { rcpt = messagesPostDto.Messages.First().Recipients.First() }, null);
         }
     }
 }

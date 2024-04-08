@@ -13,10 +13,13 @@ namespace WebApiMessaging.Services
             this._messagesBus = messagesBus;
         }
 
-        public async Task AddMessage(MessagePostDto messagePostDto, CancellationToken ct)
+        public async Task AddMessages(IEnumerable<MessagePostDto> messagesPostDto, CancellationToken ct)
         {
-            var message = messagePostDto.ToModel();
-            await _messagesBus.AddMessageToQueue(message, ct);
+            foreach (var messageToAdd in messagesPostDto)
+            {
+                var message = messageToAdd.ToModel();
+                await _messagesBus.AddMessageToQueue(message, ct);
+            }
         }
         public async Task<(MessageGetDto MessageGetDto, string Error)> GetMessage(int userId, CancellationToken ct)
         {
